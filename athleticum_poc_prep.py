@@ -143,6 +143,7 @@ plt.title('StoreID and Number of Transactions in 2016 April')
 
 
 #ToDo : just literally transform from string value to numeric values - instead of encoding? 
+sales2016Apr.info() 
 from sklearn.preprocessing import LabelEncoder
 encoder = LabelEncoder()
 ProductGrp_ID = sales2016Apr["ProductGroupID"]
@@ -156,7 +157,7 @@ sales2016Apr.columns = sales2016Apr.columns.str.strip()
 groupByProductID = sales2016Apr.groupby('ProductID')
 groupByProductID.count().sort_values(by=['Quantity'], ascending=False)
 
-#ToD0 : Join with ProductDim table and check the name of the product, product category
+#ToDo : Join with ProductDim table and check the name of the product, product category
 
 #--------------------------------------------------------------
 # Least frequently sold products (product category) per month 
@@ -188,13 +189,18 @@ sales2016Apr
 membership = sales2016Apr.loc[sales2016Apr['MembershipCardID'] != '-1']
 membership
 non_membership = sales2016Apr.loc[sales2016Apr['MembershipCardID'] == '-1']
-non_membership
+non_membership.info()
 
 #ToDo : trim all values 
 
-#ToDo : Take only necessary columns and convert values to numeric values 
-#membership = membership.convert_objects(convert_numeric=True) #deprecated
+#------------------------------------------------
+# Convert values from Object to numeric values 
+#------------------------------------------------
+membership = membership.convert_objects(convert_numeric=True) #deprecated
 membership.info()
+
+non_membership = non_membership.convert_objects(convert_numeric=True)
+non_membership.info()
 
 #-------------------------------------------------------------------------
 # Dataframe with only StoreID, ProductID, ProductGroupID, PurchasePrice
@@ -244,25 +250,12 @@ for i in range(len(membership_part)):
 plt.show()
 
 
-
-#ToDo : gender classification using product ID and purchasing time (decision tree?) 
-#ToDO : all years sales trend, find out why, can be modelled using generative approach?
-#ToDO : clustering on non-membership transaction & coloring in visualization
-#ToDo : First set the reason and do decision tree 
-#ToDo : Transform data type from string to numeric values if necessary 
-#ToDo : customer with family, especially women customers  
-#ToDo : Join Product and factSalesTransactions  
-
 #-------------------------------
 # list of columns in dataframe 
 #-------------------------------
 columnList = sales2017May.columns.tolist()
 columnList
-
-"""
-dimDateFile = 'dimDate.csv'
-readAsDataframe(dimDateFile) 
-"""         
+         
 
 #-------------------------------
 # Return reason dimension file
@@ -270,5 +263,23 @@ readAsDataframe(dimDateFile)
 returnReasonFile = 'dimReturnReason.csv' #150706 rows 
 dimReturnReason = readAsDataframe(returnReasonFile) 
 print(dimReturnReason)          
-         
+  
+
+#------------------------------------------------------------------------------------
+# ToDo : Find product to product correation with sales or with membership customer
+#------------------------------------------------------------------------------------
+dimProductFile = 'dimProduct.csv'
+dimProduct = readAsDataframe(dimProductFile) 
+dimProduct
+
+
+#ToDo : gender classification using product ID and purchasing time (decision tree?) 
+#       This can't be solved directly, because there is no labels, so not a supervised learning
+#ToDo : all years sales trend, find out why, can be modelled using generative approach?
+#ToDo : clustering on non-membership transaction & coloring in visualization
+#ToDo : First set the reason and do decision tree 
+#ToDo : customer with family, especially women customers  
+#ToDo : Join Product and factSalesTransactions  
+#ToDo : Find correlation with date and product (group)
+       
  
