@@ -35,7 +35,7 @@ def readCsvFile(fileName):
          
 # Test - Open file 
 readCsvFile('factSalesTransactions_201705.csv') #150704 rows 
-
+readCsvFile('dimProduct.csv')
 
 #----------------------------------------------
 # function : transform csv file to dataframe
@@ -44,7 +44,8 @@ def readAsDataframe(fileName):
     filePath = '/Users/soojunghong/Documents/AthleticumData_1/AthExportData_September2017/'
     #fileName = filePath + 'factSalesTransactions_201705.csv'
     file = filePath + fileName 
-    df = pd.read_csv(file)
+    #df = pd.read_csv(file)
+    df = pd.read_csv(file, error_bad_lines=False)
     return df
     #print(df.loc[1])
     
@@ -52,9 +53,11 @@ def readAsDataframe(fileName):
 salesFile = 'factSalesTransactions_201705.csv' #150706 rows 
 salesFile2017Apr = 'factSalesTransactions_201704.csv' #263842 rows
 salesFile2016Apr = 'factSalesTransactions_201604.csv' #301714
+dimProduct = 'dimProduct.csv'
 sales2017May = readAsDataframe(salesFile) 
 sales2017Apr = readAsDataframe(salesFile2017Apr)
 sales2016Apr = readAsDataframe(salesFile2016Apr)
+
 print(sales2017May) 
 print(sales2017Apr)
 print(sales2016Apr)
@@ -85,6 +88,7 @@ is_numeric_dtype(sales2017May['MembershipCardID                                 
 # count number of membership transaction
 #-----------------------------------------
 member = sales2017May.loc[sales2017May['MembershipCardID                                  '] != -1]
+member.count()
 print(type(member))
 
 #------------------------------------------
@@ -266,12 +270,126 @@ print(dimReturnReason)
   
 
 #------------------------------------------------------------------------------------
-# ToDo : Find product to product correation with sales or with membership customer
+# ToDo : Find product - product correation with sales or with membership customer
 #------------------------------------------------------------------------------------
+# Product Group dimension : 253 rows 
+dimProductGroupFile = 'dimProductGroup.csv' 
+dimProductGroup = readAsDataframe(dimProductGroupFile)
+dimProductGroup
+# ToDo : there are NaN or -1 values. Maybe data cleaning is needed
+# ToDo (Question) : What is Universal Code? Why some value is -1
+
+# Product dimension 
 dimProductFile = 'dimProduct.csv'
 dimProduct = readAsDataframe(dimProductFile) 
 dimProduct
+dimProduct.head(5)
+#ToDo : (File error) original data seems not clean - e.g. there are more columns than it should be?
 
+#---------------------------------------------------------------
+# Join 'Sales2016Apr's membership data' data and 'dimProduct' 
+#---------------------------------------------------------------
+membership = sales2016Apr.loc[sales2016Apr['MembershipCardID'] != '-1']
+membership
+membership.head(5)
+
+#import pandas as pd
+# inner join 
+joined = pd.merge(dimProduct, membership, on='ProductID', how='inner')
+joined.head(5)
+joined.tail(5)
+
+# From Joined dataframe select only 
+# 'TimeID', 'ProductID', 'ProductGroupID', 'MembershipCardID', 'PurchasePrice' 
+# 'ProductFamilyCodeDesc', 'ProductCodeDesc', 'GenderCodeDesc' 
+joined_partial = joined[['TimeID', 'ProductID', 'ProductGroupID', 'MembershipCardID', 'PurchasePrice', 'ProductFamilyCodeDesc', 'ProductCodeDesc', 'GenderCodeDesc']]
+joined_partial
+
+joined_gender_info = joined[['TimeID', 'ProductID', 'ProductGroupID', 'MembershipCardID', 'ProductCodeDesc', 'GenderCodeDesc']]
+joined_gender_info
+joined_gender_info.loc[joined_gender_info['GenderCodeDesc'].str.contains('20 - Herren')]
+# member = sales2017May.loc[sales2017May['MembershipCardID                                  '] != -1]
+
+gender_grouped = joined_gender_info.groupby(joined_gender_info['GenderCodeDesc'].str.contains('Herren'), as_index=False)
+print(gender_grouped.size())
+
+
+# ToDo : make this as a function
+def productGenderRatio(df, dimProduct): 
+    # clean column name
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=['ProductID']) 
+
+    membership = df.loc[df['MembershipCardID'] != '-1']
+   
+    joined = pd.merge(dimProduct, membership, on='ProductID', how='inner')
+    joined_gender_info = joined[['TimeID', 'ProductID', 'ProductGroupID', 'MembershipCardID', 'ProductCodeDesc', 'GenderCodeDesc']]
+    
+    gender_grouped = joined_gender_info.groupby(joined_gender_info['GenderCodeDesc'].str.contains('Herren'), as_index=False)
+    print(gender_grouped.size())
+
+# product gender on sales2017Apr
+salesFile2017Apr = 'factSalesTransactions_201704.csv' #263842 rows
+dimProduct = 'dimProduct.csv'
+
+sales2017Apr = readAsDataframe(salesFile2017Apr)
+product = readAsDataframe(dimProduct)
+productGenderRatio(sales2017Apr, product)
+
+# product gender on sales2017May
+salesFile2017May = 'factSalesTransactions_201705.csv' #263842 rows
+dimProduct = 'dimProduct.csv'
+
+sales2017May = readAsDataframe(salesFile2017May)
+product = readAsDataframe(dimProduct)
+productGenderRatio(sales2017May, product)
+
+# product gender on sales2017March
+salesFile2017March = 'factSalesTransactions_201703.csv' #263842 rows
+dimProduct = 'dimProduct.csv'
+
+sales2017March = readAsDataframe(salesFile2017March)
+product = readAsDataframe(dimProduct)
+productGenderRatio(sales2017March, product)
+"""
+GenderCodeDesc
+False     67984
+True     112824
+"""
+# Question : is it always sale of male product is twice bigger than female product? 
+
+def productGenderRatioNonMember(df, dimProduct): 
+    # clean column name
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=['ProductID']) 
+
+    non_membership = df.loc[df['MembershipCardID'] == '-1']
+   
+    joined = pd.merge(dimProduct, non_membership, on='ProductID', how='inner')
+    joined_gender_info = joined[['TimeID', 'ProductID', 'ProductGroupID', 'ProductCodeDesc', 'GenderCodeDesc']]
+    
+    gender_grouped = joined_gender_info.groupby(joined_gender_info['GenderCodeDesc'].str.contains('Herren'), as_index=False)
+    print(gender_grouped.size())
+
+# product gender on sales2017March
+salesFile2017March = 'factSalesTransactions_201703.csv' #263842 rows
+dimProduct = 'dimProduct.csv'
+
+sales2017March = readAsDataframe(salesFile2017March)
+product = readAsDataframe(dimProduct)
+productGenderRatioNonMember(sales2017March, product)
+
+sales2017March.columns = sales2017March.columns.str.strip()
+sales2017March = sales2017March.dropna(subset=['ProductID']) 
+sales2017March.info()
+sales2017March = sales2017March.convert_objects(convert_numeric=True)
+
+# ToDo : How to filter non-membership customer
+#non_membership = sales2017March.loc[sales2017March['MembershipCardID'] == '-1']
+#non_membership = sales2017March.loc[sales2017March['MembershipCardID'] < 0]
+#non_membership   
+
+# ToDo : Construct dataframe with features with all times and purchased product 
 
 #ToDo : gender classification using product ID and purchasing time (decision tree?) 
 #       This can't be solved directly, because there is no labels, so not a supervised learning
