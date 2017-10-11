@@ -24,9 +24,11 @@ import matplotlib.pyplot as plt
 # function : read csv file 
 #---------------------------
 def readCsvFile(fileName): 
- filePath = '/Users/soojunghong/Documents/AthleticumData_1/AthExportData_September2017/'
+ #filePath = '/Users/soojunghong/Documents/AthleticumData_1/AthExportData_September2017/'
+ atosFilePath = 'C:/Users/a613274/AthleticumPoc/RawData/AthExportData_September2017/'
+ 
  #fileName = filePath + 'factSalesTransactions_201705.csv'
- file = filePath + fileName
+ file = atosFilePath + fileName
  with open(file, 'rb') as f: 
      reader = csv.reader(f)
      for row in reader: 
@@ -41,9 +43,11 @@ readCsvFile('dimProduct.csv')
 # function : transform csv file to dataframe
 #----------------------------------------------
 def readAsDataframe(fileName): 
-    filePath = '/Users/soojunghong/Documents/AthleticumData_1/AthExportData_September2017/'
+    #filePath = '/Users/soojunghong/Documents/AthleticumData_1/AthExportData_September2017/'
+    atosFilePath = 'C:/Users/a613274/AthleticumPoc/RawData/AthExportData_September2017/'
+ 
     #fileName = filePath + 'factSalesTransactions_201705.csv'
-    file = filePath + fileName 
+    file = atosFilePath + fileName 
     #df = pd.read_csv(file)
     df = pd.read_csv(file, error_bad_lines=False)
     return df
