@@ -49,6 +49,7 @@ def readAsDataframe(fileName):
     #fileName = filePath + 'factSalesTransactions_201705.csv'
     file = atosFilePath + fileName 
     #df = pd.read_csv(file)
+    #ToDo : if the value between comma is empty, delete the cell
     df = pd.read_csv(file, error_bad_lines=False)
     return df
     #print(df.loc[1])
@@ -318,7 +319,9 @@ gender_grouped = joined_gender_info.groupby(joined_gender_info['GenderCodeDesc']
 print(gender_grouped.size())
 
 
-# ToDo : make this as a function
+#-------------------------
+# Product Gender Ratio
+#-------------------------
 def productGenderRatio(df, dimProduct): 
     # clean column name
     df.columns = df.columns.str.strip()
@@ -337,7 +340,9 @@ salesFile2017Apr = 'factSalesTransactions_201704.csv' #263842 rows
 dimProduct = 'dimProduct.csv'
 
 sales2017Apr = readAsDataframe(salesFile2017Apr)
+sales2017Apr #263842
 product = readAsDataframe(dimProduct)
+product #559657 - Excel shows 621544
 productGenderRatio(sales2017Apr, product)
 
 # product gender on sales2017May
@@ -360,33 +365,69 @@ GenderCodeDesc
 False     67984
 True     112824
 """
-# Question : is it always sale of male product is twice bigger than female product? 
+# Question : is it always sale of male product is twice bigger than female product?
+# Answer : Because there are more male related product 
 
 def productGenderRatioNonMember(df, dimProduct): 
     # clean column name
     df.columns = df.columns.str.strip()
-    df = df.dropna(subset=['ProductID']) 
-
-    non_membership = df.loc[df['MembershipCardID'] == '-1']
-   
-    joined = pd.merge(dimProduct, non_membership, on='ProductID', how='inner')
-    joined_gender_info = joined[['TimeID', 'ProductID', 'ProductGroupID', 'ProductCodeDesc', 'GenderCodeDesc']]
+    df = df.dropna(subset=['ProductID']) #251550
+    non_membership = df[df['MembershipCardID'].str.contains('-1')] 
+    print(non_membership.info())
+    print(dimProduct.info())
     
-    gender_grouped = joined_gender_info.groupby(joined_gender_info['GenderCodeDesc'].str.contains('Herren'), as_index=False)
-    print(gender_grouped.size())
+    #Before join (merge), you have to convert data type to numeric!
+    non_membership =  non_membership.convert_objects(convert_numeric=True)
+    dimProduct = dimProduct.convert_objects(convert_numeric=True)
+       
+    joined = pd.merge(dimProduct, non_membership, on='ProductID', how='inner')
+    #print(joined.head(10))
+    print(joined.groupby(['GenderCodeDesc']).size())
+   
+#------------------------------
+# Get membership customer
+#------------------------------
+def getMembershipCustomer(df): 
+    # clean column name
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=['ProductID']) #251550
+    membership = df[df['MembershipCardID'].str.contains('-1') == False] #23898
+    print(membership)
 
-# product gender on sales2017March
+
+#---------------------------------------------
+# product gender analysis on sales2017March
+#---------------------------------------------
 salesFile2017March = 'factSalesTransactions_201703.csv' #263842 rows
 dimProduct = 'dimProduct.csv'
 
 sales2017March = readAsDataframe(salesFile2017March)
-product = readAsDataframe(dimProduct)
+product = readAsDataframe(dimProduct) #ToDo : unclean data
+
 productGenderRatioNonMember(sales2017March, product)
 
 sales2017March.columns = sales2017March.columns.str.strip()
 sales2017March = sales2017March.dropna(subset=['ProductID']) 
 sales2017March.info()
 sales2017March = sales2017March.convert_objects(convert_numeric=True)
+
+
+#------------------------------------------------------------------------
+# From dimProduct file, calculate the ratio of gender indicated product 
+#------------------------------------------------------------------------
+dimProduct = 'dimProduct.csv'
+product = readAsDataframe(dimProduct)
+product.head(5)
+# 'GenderCodeDesc', 'SaisonCode'
+# groupby and count
+product.info()
+product.groupby(['GenderCodeDesc']).size() 
+product.groupby(['SaisonCodeDesc']).size() 
+product.groupby(['GenderCodeDesc', 'SaisonCode']).size().reset_index(name='counts')
+product.groupby(['SaisonCode']).size().reset_index(name='counts')
+
+
+
 
 # ToDo : How to filter non-membership customer
 #non_membership = sales2017March.loc[sales2017March['MembershipCardID'] == '-1']
