@@ -365,51 +365,6 @@ GenderCodeDesc
 False     67984
 True     112824
 """
-# Question : is it always sale of male product is twice bigger than female product?
-# Answer : Because there are more male related product 
-
-def productGenderRatioNonMember(df, dimProduct): 
-    # clean column name
-    df.columns = df.columns.str.strip()
-    df = df.dropna(subset=['ProductID']) #251550
-    non_membership = df[df['MembershipCardID'].str.contains('-1')] 
-    print(non_membership.info())
-    print(dimProduct.info())
-    
-    #Before join (merge), you have to convert data type to numeric!
-    non_membership =  non_membership.convert_objects(convert_numeric=True)
-    dimProduct = dimProduct.convert_objects(convert_numeric=True)
-       
-    joined = pd.merge(dimProduct, non_membership, on='ProductID', how='inner')
-    #print(joined.head(10))
-    print(joined.groupby(['GenderCodeDesc']).size())
-   
-#------------------------------
-# Get membership customer
-#------------------------------
-def getMembershipCustomer(df): 
-    # clean column name
-    df.columns = df.columns.str.strip()
-    df = df.dropna(subset=['ProductID']) #251550
-    membership = df[df['MembershipCardID'].str.contains('-1') == False] #23898
-    print(membership)
-
-
-#---------------------------------------------
-# product gender analysis on sales2017March
-#---------------------------------------------
-salesFile2017March = 'factSalesTransactions_201703.csv' #263842 rows
-dimProduct = 'dimProduct.csv'
-
-sales2017March = readAsDataframe(salesFile2017March)
-product = readAsDataframe(dimProduct) #ToDo : unclean data
-
-productGenderRatioNonMember(sales2017March, product)
-
-sales2017March.columns = sales2017March.columns.str.strip()
-sales2017March = sales2017March.dropna(subset=['ProductID']) 
-sales2017March.info()
-sales2017March = sales2017March.convert_objects(convert_numeric=True)
 
 
 #------------------------------------------------------------------------
@@ -428,11 +383,163 @@ product.groupby(['SaisonCode']).size().reset_index(name='counts')
 
 
 
+# Question : is it always sale of male product is twice bigger than female product?
+# Answer : Because there are more male related product. In average, two times more male products than female products
 
-# ToDo : How to filter non-membership customer
-#non_membership = sales2017March.loc[sales2017March['MembershipCardID'] == '-1']
-#non_membership = sales2017March.loc[sales2017March['MembershipCardID'] < 0]
-#non_membership   
+#----------------------------------------------------------------
+# Analyze product gender description on Non-membership customer 
+#----------------------------------------------------------------
+def productGenderRatioNonMember(df, dimProduct): 
+    # clean column name
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=['ProductID']) #251550
+    # non-membership customers 
+    non_membership = df[df['MembershipCardID'].str.contains('-1')] 
+    print(non_membership.info())
+    print(dimProduct.info())
+    
+    # Before join (merge), you have to convert data type to numeric, otherwise merge wouldn't work!
+    non_membership =  non_membership.convert_objects(convert_numeric=True)
+    dimProduct = dimProduct.convert_objects(convert_numeric=True)
+    
+    # inner join 'non_membership' and 'dimProduct' dataframe
+    joined = pd.merge(dimProduct, non_membership, on='ProductID', how='inner')
+    # show gender code description of 
+    print(joined.groupby(['GenderCodeDesc']).size())
+
+
+
+#----------------------------------------------------------------
+# Analyze product gender description on Non-membership customer 
+#----------------------------------------------------------------
+def productGenderRatioMembership(df, dimProduct): 
+    # clean column name
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=['ProductID']) #251550
+    # non-membership customers 
+    membership = df[df['MembershipCardID'].str.contains('-1') == False] 
+    print(membership.info())
+    print(dimProduct.info())
+    
+    # Before join (merge), you have to convert data type to numeric, otherwise merge wouldn't work!
+    membership =  membership.convert_objects(convert_numeric=True)
+    dimProduct = dimProduct.convert_objects(convert_numeric=True)
+    
+    # inner join 'non_membership' and 'dimProduct' dataframe
+    joined = pd.merge(dimProduct, membership, on='ProductID', how='inner')
+    # show gender code description of 
+    print(joined.groupby(['GenderCodeDesc']).size())
+
+   
+#------------------------------
+# Get membership customer
+#------------------------------
+def getMembershipCustomer(df): 
+    # clean column name
+    df.columns = df.columns.str.strip()
+    df = df.dropna(subset=['ProductID']) #251550
+    membership = df[df['MembershipCardID'].str.contains('-1') == False] #23898
+    print(membership)
+
+
+#--------------------------------------------------------------------------
+# product gender analysis on sales2017March for Non-membership customers
+#--------------------------------------------------------------------------
+salesFile2017March = 'factSalesTransactions_201703.csv' #263842 rows
+dimProduct = 'dimProduct.csv'
+
+sales2017March = readAsDataframe(salesFile2017March)
+product = readAsDataframe(dimProduct) #ToDo : unclean data
+
+productGenderRatioNonMember(sales2017March, product)
+
+"""
+Question : Why 'GenderCodeDesc' has same # of classes
+10 - Damen      5481
+20 - Herren    10835
+30 - Kinder     3264
+"""
+sales2017March.columns = sales2017March.columns.str.strip()
+sales2017March = sales2017March.dropna(subset=['ProductID']) 
+sales2017March.info()
+sales2017March = sales2017March.convert_objects(convert_numeric=True)
+
+
+
+#---------------------------------------------------------------------
+# product gender analysis on sales2017March for membership customers
+#---------------------------------------------------------------------
+salesFile2017March = 'factSalesTransactions_201703.csv' #263842 rows
+dimProduct = 'dimProduct.csv'
+
+sales2017March = readAsDataframe(salesFile2017March)
+product = readAsDataframe(dimProduct) #ToDo : unclean data
+productGenderRatioMembership(sales2017March, product)
+
+
+#----------------------
+# product Group file  
+#----------------------
+productGrpFile = 'dimProductGroup.csv' 
+productGrp = readAsDataframe(productGrpFile)
+productGrp.head(5)
+productGrp.info()
+
+# CategoryDesc
+productGrp.groupby(['CategoryDesc']).size()
+
+# UniverseDesc
+productGrp.groupby(['UniverseDesc']).size()
+
+# ProductGroupDesc 
+productGrp.groupby(['ProductGroupDesc']).size()
+productGrp.groupby(['ProductGroupID']).size()
+
+# class 
+productGrp.groupby(['ClassDesc']).size()
+
+#-----------------------------------------------------------
+# Find out outlier product (e.g. winter product in summer)
+#-----------------------------------------------------------
+# Finding (to join)
+# product group's universe code is same as product universe code 
+# product group's 'ProductGroupDesc' is same as ''WarengroupCodeDesc'
+
+dimProduct = 'dimProduct.csv'
+product = readAsDataframe(dimProduct) #ToDo : unclean data
+product.info()
+product.head(5)
+product.groupby(['UniverseCodeDesc']).size()
+
+product.groupby(['UniverseCode']).size()
+
+product.groupby(['ProductFamilyCodeDesc']).size()
+
+product.groupby(['WarengroupCodeDesc']).size() # 101 - Alpinski
+product.groupby(['WarengroupCode']).size() # 101 - Alpinski
+
+#----------------------------------------
+# summer sales data example (2016 Aug)
+#----------------------------------------
+salesFile2016Aug = 'factSalesTransactions_201608.csv' #263842 rows
+sales2016Aug = readAsDataframe(salesFile2016Aug)
+sales2016Aug.head(5)
+sales2016Aug = sales2016Aug.convert_objects(convert_numeric=True)
+sales2016Aug.columns = sales2016Aug.columns.str.strip()
+
+product.columns = product.columns.str.strip()
+product = product.dropna(subset=['ProductID']) #251550
+product = product.convert_objects(convert_numeric=True)
+product.info()
+   
+joined = pd.merge(product, sales2016Aug, on='ProductID', how='inner')
+joined.info()
+warenGroupBy = joined.groupby(['WarengroupCodeDesc']).size() # 101 - Alpinski
+warenGroupBy
+
+universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
+universeGroupBy
+
 
 # ToDo : Construct dataframe with features with all times and purchased product 
 
