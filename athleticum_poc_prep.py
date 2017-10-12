@@ -542,19 +542,18 @@ universeGroupBy
 
 """
 UniverseCodeDesc
-10 - Wintersport                       54384
-20 - Outdoor                           26059
-25 - Wassersport                        6014
-30 - Lifestyle                         21545
-40 - Multisport                        26772
-50 - Running                           14308
-60 - Fitness                           33990
-70 - Ballsport                         27914
-80 - Velo/Rollers                      14044
-85 - Unterw�sche                       30791
-90 - Services/Miete/Aussersortiment     3680
-99 - N/A                                   6
-"""
+10 - Wintersport                         452
+20 - Outdoor                           50973
+25 - Wassersport                       25848
+30 - Lifestyle                         17094
+40 - Multisport                        24778
+50 - Running                           15192
+60 - Fitness                           46927
+70 - Ballsport                         42338
+80 - Velo/Rollers                      28506
+85 - Unterw�sche                       10351
+90 - Services/Miete/Aussersortiment      398
+99 - N/A       """
 
 
 #----------------------------------------
