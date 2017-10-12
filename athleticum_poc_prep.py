@@ -540,6 +540,22 @@ warenGroupBy
 universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
 universeGroupBy
 
+"""
+UniverseCodeDesc
+10 - Wintersport                       54384
+20 - Outdoor                           26059
+25 - Wassersport                        6014
+30 - Lifestyle                         21545
+40 - Multisport                        26772
+50 - Running                           14308
+60 - Fitness                           33990
+70 - Ballsport                         27914
+80 - Velo/Rollers                      14044
+85 - Unterw�sche                       30791
+90 - Services/Miete/Aussersortiment     3680
+99 - N/A                                   6
+"""
+
 
 #----------------------------------------
 # winter sales data example (2016 Dec)
@@ -562,7 +578,21 @@ warenGroupBy
 
 universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
 universeGroupBy
-
+"""
+UniverseCodeDesc
+10 - Wintersport                       54384
+20 - Outdoor                           26059
+25 - Wassersport                        6014
+30 - Lifestyle                         21545
+40 - Multisport                        26772
+50 - Running                           14308
+60 - Fitness                           33990
+70 - Ballsport                         27914
+80 - Velo/Rollers                      14044
+85 - Unterw�sche                       30791
+90 - Services/Miete/Aussersortiment     3680
+99 - N/A                                   6
+"""
 
 # ToDo : Construct dataframe with features with all times and purchased product 
 
