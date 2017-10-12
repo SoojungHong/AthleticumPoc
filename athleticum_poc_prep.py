@@ -541,6 +541,29 @@ universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
 universeGroupBy
 
 
+#----------------------------------------
+# winter sales data example (2016 Dec)
+#----------------------------------------
+salesFile2016Dec = 'factSalesTransactions_201612.csv' #263842 rows
+sales2016Dec = readAsDataframe(salesFile2016Dec)
+sales2016Dec.head(5)
+sales2016Dec = sales2016Dec.convert_objects(convert_numeric=True)
+sales2016Dec.columns = sales2016Dec.columns.str.strip()
+
+product.columns = product.columns.str.strip()
+product = product.dropna(subset=['ProductID']) #251550
+product = product.convert_objects(convert_numeric=True)
+product.info()
+   
+joined = pd.merge(product, sales2016Dec, on='ProductID', how='inner')
+joined.info()
+warenGroupBy = joined.groupby(['WarengroupCodeDesc']).size() # 101 - Alpinski
+warenGroupBy
+
+universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
+universeGroupBy
+
+
 # ToDo : Construct dataframe with features with all times and purchased product 
 
 #ToDo : gender classification using product ID and purchasing time (decision tree?) 
