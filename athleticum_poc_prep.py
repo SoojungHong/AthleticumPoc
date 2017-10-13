@@ -597,6 +597,7 @@ UniverseCodeDesc
 # ToDo : Create Dataframe from groupby result  and visualize the histogram or chart 
 universeGroupBy.get('10 - Wintersport')
 import numpy as np
+import matplotlib.pyplot as plt
 #import pandas
 columns = ['Month', '10 - Wintersport', '25 - Wassersport', '50 - Running']
 index = np.arange(0) # array of numbers 12 (12 month)
@@ -612,7 +613,10 @@ universeDF
 universeDF = universeDF.astype(np.float)
 #universeDF.hist(column= '50 - Running')
 
-universeDF.plot.hist()
+#universeDF.plot.hist()
+universeDF.plot.bar()
+plt.show()
+
 
 
 
