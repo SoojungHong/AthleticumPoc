@@ -573,10 +573,11 @@ product.info()
 joined = pd.merge(product, sales2016Dec, on='ProductID', how='inner')
 joined.info()
 warenGroupBy = joined.groupby(['WarengroupCodeDesc']).size() # 101 - Alpinski
-warenGroupBy
+print(type(warenGroupBy))
 
 universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
-universeGroupBy
+universeGroupBy.sort_values(ascending=True) # sorting the Series with ascending order
+
 """
 UniverseCodeDesc
 10 - Wintersport                       54384
@@ -592,6 +593,42 @@ UniverseCodeDesc
 90 - Services/Miete/Aussersortiment     3680
 99 - N/A                                   6
 """
+
+# ToDo : Create Dataframe from groupby result  and visualize the histogram or chart 
+universeGroupBy.get('10 - Wintersport')
+import numpy as np
+#import pandas
+columns = ['Month', '10 - Wintersport', '25 - Wassersport', '50 - Running']
+index = np.arange(0) # array of numbers 12 (12 month)
+universeDF = pd.DataFrame(columns=columns, index = index)
+universeDF
+#universeDF = universeDF.set_value(len(universeDF), 'Month', 'December')
+#universeDF = universeDF.set_value(len(universeDF), '10 - Wintersport', 54384)
+#universeDF = universeDF.set_value(len(universeDF), '25 - Wassersport', 6014)
+universeDF = universeDF.append({'Month':12, '10 - Wintersport': 54384, '25 - Wassersport' : 6014, '50 - Running':14308}, ignore_index=True)
+universeDF = universeDF.append({'Month':8, '10 - Wintersport': 452, '25 - Wassersport' : 25848, '50 - Running':15192}, ignore_index=True)
+universeDF
+
+universeDF = universeDF.astype(np.float)
+#universeDF.hist(column= '50 - Running')
+
+universeDF.plot.hist()
+
+
+
+"""
+--------------------------------------------
+Month ¦ Wintersport ¦ Wassersport ¦ Running 
+--------------------------------------------
+ Jan  ¦    123      ¦  342        ¦ 3242
+--------------------------------------------
+ Feb  ¦    489      ¦  898        ¦ 423 
+-------------------------------------------- 
+
+"""
+
+# ToDo : check the trend or change of numbers in each UniverseCode Description in each month 
+# for each month, and check the trend
 
 # ToDo : Construct dataframe with features with all times and purchased product 
 
