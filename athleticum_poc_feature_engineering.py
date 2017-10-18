@@ -21,6 +21,8 @@ from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
+from random import randint
+
 
 
 #----------------------------------------------
@@ -82,7 +84,18 @@ def setSumNetAmount(df, featureDF, date):
     featureDF = featureDF.append({'Date': date, 'NetAmount': netAmount}, ignore_index=True)
     #print(featureDF)
     return featureDF
-   
+ 
+
+#-----------------------------------------------------
+# function : set Net amount (per month) of given 
+#-----------------------------------------------------
+def setFeature(df, featureDF, date):    
+    df = df.dropna(subset=['NetAmount']) #if value is NaN, drop it 
+    df = df.convert_objects(convert_numeric=True) #convert to numeric values
+    netAmount = df['NetAmount'].sum()
+    featureDF = featureDF.append({'Date': date, 'NetAmount': netAmount, 'Weather': randint(1, 10), 'NumVisitor': randint(100, 300)}, ignore_index=True)
+    return featureDF
+     
 
 #-----------------------------
 # Test : Read one sales file
@@ -97,7 +110,7 @@ getNetAmount(sales)
 #--------------------------------------------------
 # Construct dataframe with 'Time' and 'NetAmount'
 #--------------------------------------------------
-columnNames = ['Date', 'NetAmount']
+columnNames = ['Date', 'NetAmount', 'Weather', 'NumVisitor']
 index = np.arange(0)
 featureDF = pd.DataFrame(columns=columnNames, index = index)
 
@@ -128,7 +141,8 @@ for y in years :
         df = readAsDataframe(salesFile)
         #getNetAmount(df)
         date = str(y) + '12'
-        featureDF = setSumNetAmount(df, featureDF, date)
+        #featureDF = setSumNetAmount(df, featureDF, date)
+        featureDF = setFeature(df, featureDF, date)
         print(featureDF)
     else :     
         if y == 2017 :
@@ -140,7 +154,8 @@ for y in years :
                     df = readAsDataframe(salesFile)
                     #getNetAmount(df)
                     date = str(y) + str(0) + str(m)
-                    featureDF = setSumNetAmount(df, featureDF, date)
+                    #featureDF = setSumNetAmount(df, featureDF, date)
+                    featureDF = setFeature(df, featureDF, date)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
@@ -148,7 +163,8 @@ for y in years :
                     df = readAsDataframe(salesFile)
                     #getNetAmount(df)
                     date = str(y) + str(m)
-                    featureDF = setSumNetAmount(df, featureDF, date)
+                    #featureDF = setSumNetAmount(df, featureDF, date)
+                    featureDF = setFeature(df, featureDF, date)
         else :
             for m in month_in_general : 
                 if(m < 10) : 
@@ -158,7 +174,8 @@ for y in years :
                     df = readAsDataframe(salesFile)
                     #getNetAmount(df)
                     date = str(y) + str(0) + str(m)
-                    featureDF = setSumNetAmount(df, featureDF, date)
+                    #featureDF = setSumNetAmount(df, featureDF, date)
+                    featureDF = setFeature(df, featureDF, date)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
@@ -166,12 +183,15 @@ for y in years :
                     df = readAsDataframe(salesFile)
                     #getNetAmount(df)
                     date = str(y) + str(m)
-                    featureDF = setSumNetAmount(df, featureDF, date)
+                    #featureDF = setSumNetAmount(df, featureDF, date)
+                    featureDF = setFeature(df, featureDF, date)
 
 
 print(featureDF)
 featureDF.info()
 # To Do : Why?? 0 index and 1 index same?? 
+
+
 
 #--------------------------
 # Visualize the NetAmount 
@@ -179,5 +199,41 @@ featureDF.info()
 import matplotlib.pyplot as plt
 
 featureDF = featureDF.astype(np.float)
-featureDF.plot.bar(figsize=(30,10), fontsize=12)
+featureDF.plot.bar(figsize=(20,10), fontsize=12)
 plt.show()
+
+#featureDF.plot(kind="scatter", x="Date", y="NetAmount", alpha=0.1)
+#plt.show()
+
+
+
+#------------------------------
+# Split training and test data 
+#------------------------------
+from sklearn.model_selection import train_test_split
+
+train_set, test_set = train_test_split(featureDF, test_size=0.2, random_state=42)
+train_set
+test_set
+
+featureDF_without_label = housing = train_set.drop("NetAmount", axis=1)
+netAmount_labels = train_set["NetAmount"].copy()
+netAmount_labels
+test_labels = test_set["NetAmount"].copy()
+test_labels
+test_prepared = test_set.drop("NetAmount", axis=1)
+test_prepared
+
+#---------------------------------------------
+# The simplest (!) linear regression model
+#--------------------------------------------
+from sklearn.linear_model import LinearRegression
+
+lin_reg = LinearRegression()
+lin_reg.fit(featureDF_without_label, netAmount_labels)
+
+from sklearn.metrics import mean_squared_error
+netAmount_predictions = lin_reg.predict(test_prepared)
+lin_mse = mean_squared_error(test_labels, netAmount_predictions)
+lin_rmse = np.sqrt(lin_mse)
+lin_rmse
