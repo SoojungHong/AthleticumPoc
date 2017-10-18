@@ -62,14 +62,26 @@ def readTsvAsDataframe(fileName):
 #--------------------------------------------
 # function : Sum all net amount (per month)
 #--------------------------------------------
-def sumNetAmount(df):
+def getNetAmount(df):
     
     df = df.dropna(subset=['NetAmount']) #if value is NaN, drop it 
     df = df.convert_objects(convert_numeric=True) #convert to numeric values
 
     netAmount = df['NetAmount'].sum()
     print(netAmount)
-    
+    return netAmount
+
+
+#-----------------------------------------------------
+# function : set Net amount (per month) of given 
+#-----------------------------------------------------
+def setSumNetAmount(df, featureDF, date):    
+    df = df.dropna(subset=['NetAmount']) #if value is NaN, drop it 
+    df = df.convert_objects(convert_numeric=True) #convert to numeric values
+    netAmount = df['NetAmount'].sum()
+    featureDF = featureDF.append({'Date': date, 'NetAmount': netAmount}, ignore_index=True)
+    #print(featureDF)
+    return featureDF
    
 
 #-----------------------------
@@ -78,7 +90,18 @@ def sumNetAmount(df):
 salesFile = 'factSalesTransactions_201705.csv' #150706 rows 
 sales = readAsDataframe(salesFile) 
 sales.info()
-sumNetAmount(sales)
+getNetAmount(sales)
+
+
+                
+#--------------------------------------------------
+# Construct dataframe with 'Time' and 'NetAmount'
+#--------------------------------------------------
+columnNames = ['Date', 'NetAmount']
+index = np.arange(0)
+featureDF = pd.DataFrame(columns=columnNames, index = index)
+
+
 
 #-----------------------------------------
 # Read all sales files (201212 - 201705)
@@ -103,8 +126,10 @@ for y in years :
     if y == 2012 : 
         salesFile = 'factSalesTransactions_' + str(startYear) + '12' + '.csv'
         df = readAsDataframe(salesFile)
-        sumNetAmount(df)
-        print(salesFile)
+        #getNetAmount(df)
+        date = str(y) + '12'
+        featureDF = setSumNetAmount(df, featureDF, date)
+        print(featureDF)
     else :     
         if y == 2017 :
             for m in month_in_2017 : 
@@ -112,18 +137,47 @@ for y in years :
                     salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
                     #print(salesFile)
+                    df = readAsDataframe(salesFile)
+                    #getNetAmount(df)
+                    date = str(y) + str(0) + str(m)
+                    featureDF = setSumNetAmount(df, featureDF, date)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
                     #print(salesFile)
+                    df = readAsDataframe(salesFile)
+                    #getNetAmount(df)
+                    date = str(y) + str(m)
+                    featureDF = setSumNetAmount(df, featureDF, date)
         else :
             for m in month_in_general : 
                 if(m < 10) : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
                     #print(salesFile)
+                    df = readAsDataframe(salesFile)
+                    #getNetAmount(df)
+                    date = str(y) + str(0) + str(m)
+                    featureDF = setSumNetAmount(df, featureDF, date)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
                     #print(salesFile)
-                
+                    df = readAsDataframe(salesFile)
+                    #getNetAmount(df)
+                    date = str(y) + str(m)
+                    featureDF = setSumNetAmount(df, featureDF, date)
+
+
+print(featureDF)
+featureDF.info()
+# To Do : Why?? 0 index and 1 index same?? 
+
+#--------------------------
+# Visualize the NetAmount 
+#--------------------------
+import matplotlib.pyplot as plt
+
+featureDF = featureDF.astype(np.float)
+featureDF.plot.bar(figsize=(30,10), fontsize=12)
+plt.show()
