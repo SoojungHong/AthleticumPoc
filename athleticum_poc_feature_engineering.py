@@ -36,6 +36,10 @@ def readAsDataframe(fileName):
     #if the read row contains error, throw error 
     df = pd.read_csv(file, error_bad_lines=False)
     df.info()
+    
+    #strip column names 
+    df.columns = df.columns.str.strip()
+
     print(df.head(10))
     return df
     
@@ -53,6 +57,19 @@ def readTsvAsDataframe(fileName):
     #read .csv file using tab separator, if the read row contains error, throw error 
     df = pd.read_csv(file, error_bad_lines=False, sep="\t")
     return df
+
+
+#--------------------------------------------
+# function : Sum all net amount (per month)
+#--------------------------------------------
+def sumNetAmount(df):
+    
+    df = df.dropna(subset=['NetAmount']) #if value is NaN, drop it 
+    df = df.convert_objects(convert_numeric=True) #convert to numeric values
+
+    netAmount = df['NetAmount'].sum()
+    print(netAmount)
+    
    
 
 #-----------------------------
@@ -60,6 +77,8 @@ def readTsvAsDataframe(fileName):
 #-----------------------------
 salesFile = 'factSalesTransactions_201705.csv' #150706 rows 
 sales = readAsDataframe(salesFile) 
+sales.info()
+sumNetAmount(sales)
 
 #-----------------------------------------
 # Read all sales files (201212 - 201705)
@@ -83,22 +102,28 @@ month_in_2017
 for y in years : 
     if y == 2012 : 
         salesFile = 'factSalesTransactions_' + str(startYear) + '12' + '.csv'
+        df = readAsDataframe(salesFile)
+        sumNetAmount(df)
         print(salesFile)
     else :     
         if y == 2017 :
             for m in month_in_2017 : 
                 if(m < 10) :
                     salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
-                    print(salesFile)
+                    #readAsDataframe(salesFile)
+                    #print(salesFile)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
-                    print(salesFile)
+                    #readAsDataframe(salesFile)
+                    #print(salesFile)
         else :
             for m in month_in_general : 
                 if(m < 10) : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
-                    print(salesFile)
+                    #readAsDataframe(salesFile)
+                    #print(salesFile)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
-                    print(salesFile)
+                    #readAsDataframe(salesFile)
+                    #print(salesFile)
                 
