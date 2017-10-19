@@ -251,3 +251,21 @@ from sklearn.model_selection import cross_val_score
 scores = cross_val_score(tree_reg, featureDF_without_label, netAmount_labels, scoring="neg_mean_squared_error", cv=10)
 tree_rmse_scores = np.sqrt(-scores)
 
+
+# ToDo : Fine tune model adapting the hyperparameters 
+"""
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GridSearchCV
+
+param_grid = [
+    {'n_estimators': [3, 10, 30], 'max_features': [1, 2, 3]},
+    {'bootstrap': [False], 'n_estimators': [3, 10], 'max_features': [2, 3, 4]},
+  ]
+
+forest_reg = RandomForestRegressor()
+
+grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
+                           scoring='neg_mean_squared_error')
+
+grid_search.fit(featureDF_without_label , netAmount_labels)
+"""    
