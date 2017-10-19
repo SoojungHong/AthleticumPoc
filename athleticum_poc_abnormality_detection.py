@@ -97,6 +97,35 @@ def convertDate(dateStr):
 
 
 
+#----------------------------------------------------------
+# function : find most frequently purchased product group
+#---------------------------------------------------------
+def getMostFreqGroup(universeGroupBy): 
+    topFive = universeGroupBy.nlargest(5)
+    topFive 
+
+    m = 0
+    while (topFive.keys()[m].find('N/A') != -1):
+        print 'It is N/A'
+        m = m + 1
+    #print m#topFive[m]    
+    return topFive.keys()[m]
+
+
+#----------------------------------------------------------
+# function : find least frequently purchased product group
+#---------------------------------------------------------
+def getLeastFreqGroup(universeGroupBy): 
+    bottomFive = universeGroupBy.nsmallest(5)
+    bottomFive 
+
+    l = 0
+    while (bottomFive.keys()[l].find('N/A') != -1):
+        print 'It is N/A'
+        l = l + 1  
+    #print bottomFive.keys()[l]
+    return bottomFive.keys()[l]
+    
         
 #----------------------------------------------------------------------------------------------------------------------------
 # Construct dataframe with 'Date', 'Most frequent Product category', 'Least frequent Product category', 'Abnormality Class'
@@ -144,35 +173,14 @@ joined.tail(10)
 universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() # 10 wintersport
 universeGroupBy.keys()[1]
 universeGroupBy[1]
-# First get nlargest 5, pick which is not N/A
-topFive = universeGroupBy.nlargest(5)
-topFive 
+universeGroupBy
 
-m = 0
-while (topFive.keys()[m].find('N/A') != -1):
-    print 'It is N/A'
-    m = m + 1
-print m#topFive[m]    
+test = getMostFreqGroup(universeGroupBy)
+test 
 
-universeGroupBy.nsmallest(3)
-print(type(universeGroupBy))
 
-# among smallest, which is not N/A
-bottomFive = universeGroupBy.nsmallest(5)
-bottomFive 
-
-l = 0
-while (bottomFive.keys()[l].find('N/A') != -1):
-    print 'It is N/A'
-    l = l + 1  
-print bottomFive.keys()[l]
-
-print bottomFive[l]
-print bottomFive.keys()[l]    
-
-universeGroupBy.nsmallest(3)
-print(type(universeGroupBy))
-
+test2 = getLeastFreqGroup(universeGroupBy)
+test2 
 
 # ToDo : Why UniverseCodeDesc is NaN? 
 # ToDo : Normalization of the product category (since number of ballsport is bigger than Running for example)
