@@ -22,6 +22,8 @@ from pandas.api.types import is_numeric_dtype
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import matplotlib.pyplot as plt
 from random import randint
+import datetime as dt
+
 
 
 
@@ -37,12 +39,12 @@ def readAsDataframe(fileName):
     
     #if the read row contains error, throw error 
     df = pd.read_csv(file, error_bad_lines=False)
-    df.info()
+    #df.info()
     
     #strip column names 
     df.columns = df.columns.str.strip()
 
-    print(df.head(10))
+    #print(df.head(10))
     return df
     
      
@@ -81,7 +83,7 @@ def setSumNetAmount(df, featureDF, date):
     df = df.dropna(subset=['NetAmount']) #if value is NaN, drop it 
     df = df.convert_objects(convert_numeric=True) #convert to numeric values
     netAmount = df['NetAmount'].sum()
-    featureDF = featureDF.append({'Date': date, 'NetAmount': netAmount}, ignore_index=True)
+    featureDF = featureDF.append({'Date': convertDate(date), 'NetAmount': netAmount}, ignore_index=True)
     #print(featureDF)
     return featureDF
  
@@ -93,9 +95,18 @@ def setFeature(df, featureDF, date):
     df = df.dropna(subset=['NetAmount']) #if value is NaN, drop it 
     df = df.convert_objects(convert_numeric=True) #convert to numeric values
     netAmount = df['NetAmount'].sum()
-    featureDF = featureDF.append({'Date': date, 'NetAmount': netAmount, 'Weather': randint(1, 10), 'NumVisitor': randint(100, 300)}, ignore_index=True)
+    featureDF = featureDF.append({'Date': convertDate(date), 'NetAmount': netAmount, 'Weather': randint(1, 10), 'NumVisitor': randint(100, 300)}, ignore_index=True)
     return featureDF
      
+
+
+#-------------------------------------------
+# function : convert string to date format
+#-------------------------------------------
+def convertDate(dateStr): 
+    date = dt.datetime.strptime(dateStr, '%Y%m')
+    return date
+
 
 #-----------------------------
 # Test : Read one sales file
@@ -107,9 +118,9 @@ getNetAmount(sales)
 
 
                 
-#--------------------------------------------------
-# Construct dataframe with 'Time' and 'NetAmount'
-#--------------------------------------------------
+#-------------------------------------------------------------------------
+# Construct dataframe with 'Time', 'NetAmount', 'Weather', 'NumVisitor'
+#-------------------------------------------------------------------------
 columnNames = ['Date', 'NetAmount', 'Weather', 'NumVisitor']
 index = np.arange(0)
 featureDF = pd.DataFrame(columns=columnNames, index = index)
@@ -119,91 +130,71 @@ featureDF = pd.DataFrame(columns=columnNames, index = index)
 #-----------------------------------------
 # Read all sales files (201212 - 201705)
 #-----------------------------------------
-startYear = 2012
-endYear = 2017
-
 years = range(2012, 2018)
-years
- 
 month_in_2012 = range(12, 13)
-month_in_2012
-
 month_in_general = range(1, 13)
-month_in_general
-
 month_in_2017 = range(1, 6)
-month_in_2017
 
 
 for y in years : 
     if y == 2012 : 
-        salesFile = 'factSalesTransactions_' + str(startYear) + '12' + '.csv'
+        salesFile = 'factSalesTransactions_' + str(y) + '12' + '.csv'
         df = readAsDataframe(salesFile)
+        print(salesFile)
         #getNetAmount(df)
         date = str(y) + '12'
-        #featureDF = setSumNetAmount(df, featureDF, date)
         featureDF = setFeature(df, featureDF, date)
-        print(featureDF)
     else :     
         if y == 2017 :
             for m in month_in_2017 : 
                 if(m < 10) :
                     salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
-                    #print(salesFile)
+                    print(salesFile)
                     df = readAsDataframe(salesFile)
-                    #getNetAmount(df)
                     date = str(y) + str(0) + str(m)
-                    #featureDF = setSumNetAmount(df, featureDF, date)
                     featureDF = setFeature(df, featureDF, date)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
-                    #print(salesFile)
+                    print(salesFile)
                     df = readAsDataframe(salesFile)
-                    #getNetAmount(df)
                     date = str(y) + str(m)
-                    #featureDF = setSumNetAmount(df, featureDF, date)
                     featureDF = setFeature(df, featureDF, date)
         else :
             for m in month_in_general : 
                 if(m < 10) : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
-                    #print(salesFile)
+                    print(salesFile)
                     df = readAsDataframe(salesFile)
-                    #getNetAmount(df)
                     date = str(y) + str(0) + str(m)
-                    #featureDF = setSumNetAmount(df, featureDF, date)
                     featureDF = setFeature(df, featureDF, date)
                 else : 
                     salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
                     #readAsDataframe(salesFile)
-                    #print(salesFile)
+                    print(salesFile)
                     df = readAsDataframe(salesFile)
-                    #getNetAmount(df)
                     date = str(y) + str(m)
-                    #featureDF = setSumNetAmount(df, featureDF, date)
                     featureDF = setFeature(df, featureDF, date)
 
 
 print(featureDF)
 featureDF.info()
-# To Do : Why?? 0 index and 1 index same?? 
-
-
+featureDF
 
 #--------------------------
 # Visualize the NetAmount 
 #--------------------------
-import matplotlib.pyplot as plt
 
-featureDF = featureDF.astype(np.float)
-featureDF.plot.bar(figsize=(20,10), fontsize=12)
+# plot all attributes with its distribution
+featureDF.hist(bins=50, figsize=(20,15))
 plt.show()
 
-#featureDF.plot(kind="scatter", x="Date", y="NetAmount", alpha=0.1)
-#plt.show()
+
+#featureDF = featureDF.astype(np.float)
+featureDF.plot.bar(figsize=(20,10), fontsize=12)
+plt.show()
 
 
 
@@ -224,9 +215,11 @@ test_labels
 test_prepared = test_set.drop("NetAmount", axis=1)
 test_prepared
 
-#---------------------------------------------
-# The simplest (!) linear regression model
-#--------------------------------------------
+
+#-------------------------------------------------------------------------------------
+# The simplest (!) linear regression model 
+# At the moment, the weather data and number of visitor are randomly generated one
+#-------------------------------------------------------------------------------------
 from sklearn.linear_model import LinearRegression
 
 lin_reg = LinearRegression()
@@ -234,6 +227,27 @@ lin_reg.fit(featureDF_without_label, netAmount_labels)
 
 from sklearn.metrics import mean_squared_error
 netAmount_predictions = lin_reg.predict(test_prepared)
+
 lin_mse = mean_squared_error(test_labels, netAmount_predictions)
 lin_rmse = np.sqrt(lin_mse)
 lin_rmse
+
+#--------------------------------------
+# Model with Decision Tree Regressor 
+#--------------------------------------
+from sklearn.tree import DecisionTreeRegressor
+
+tree_reg = DecisionTreeRegressor()
+tree_reg.fit(featureDF_without_label, netAmount_labels) 
+netAmount_tree_predictions = tree_reg.predict(test_prepared)
+tree_mse = mean_squared_error(test_labels, netAmount_tree_predictions)
+tree_rmse = np.sqrt(tree_mse)
+tree_rmse
+
+#---------------------------
+# Cross Validation 
+#---------------------------
+from sklearn.model_selection import cross_val_score
+scores = cross_val_score(tree_reg, featureDF_without_label, netAmount_labels, scoring="neg_mean_squared_error", cv=10)
+tree_rmse_scores = np.sqrt(-scores)
+
