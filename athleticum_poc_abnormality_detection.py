@@ -126,19 +126,6 @@ def getLeastFreqGroup(universeGroupBy):
     #print bottomFive.keys()[l]
     return bottomFive.keys()[l]
     
-        
-#----------------------------------------------------------------------------------------------------------------------------
-# Construct dataframe with 'Date', 'Most frequent Product category', 'Least frequent Product category', 'Abnormality Class'
-#----------------------------------------------------------------------------------------------------------------------------
-columnNames = ['Date', 'Most Frequent Product Category', 'Least Frequent Product Category', 'Abnormality Class']
-index = np.arange(0)
-featureDF = pd.DataFrame(columns=columnNames, index = index)
-
-# 1. read sales data 
-# 2. join with product dimension data 
-# 3. count the frequency of purchase per UniverseCode
-# 4. Pick the most frequent product category (universe)
-# 5. Pick the least frequent product category (universe)
 
 
 #-----------------------------
@@ -182,5 +169,207 @@ test
 test2 = getLeastFreqGroup(universeGroupBy)
 test2 
 
+
+
+#-------------
+# Get month 
+#-------------
+"""
+df.iloc[[2]]
+
+joined 
+
+joined_df = joined.as_matrix()
+NROW(joined_df)
+joined_df.shape
+total_rows=len(df.axes[0])
+total_rows
+total_cols=len(df.axes[1])
+total_cols
+
+i = 1000
+joined_df[i]
+"""
+
+def getSeasonByMonth(row):
+    season = 'spring'
+    # get Month 
+    dateInt = int(row['DateID'])
+    #print(dateInt)
+    dateStr = str(dateInt)
+    datee = dt.datetime.strptime(dateStr, "%Y%m%d")
+    #print(datee.month)
+    month = datee.month
+    if(month > 5 & month < 10) : 
+        season = 'summer'
+    else: 
+        if(month < 3 & month > 10):
+            season = 'winter'
+    print(season)        
+    return season
+    # return season 
+    
+    
+#----------------------------------------------
+# Join product and Monthly Sales Transaction 
+#----------------------------------------------
+def getJoinedWithProduct(sales, product):
+    """
+    dimProduct = 'dimProduct_TSV.csv' #ToDo : Read TSV
+    #product = readAsDataframe(dimProduct) #ToDo : unclean data
+    product = readTsvAsDataframe(dimProduct)
+    product.info()
+    product.head(5)
+    product.groupby(['UniverseCodeDesc']).size()
+    """
+
+    # do a bit of data cleaning 
+    sales = sales.convert_objects(convert_numeric=True)
+    sales.columns = sales.columns.str.strip()
+
+    product.columns = product.columns.str.strip()
+    product = product.dropna(subset=['ProductID']) #251550
+    #product = product.convert_objects(convert_numeric=True)
+    joined = pd.merge(product, sales, on='ProductID', how='inner')
+    
+    return joined
+    
+
+"""
+def readRowInDataframe(df):
+    winterSeason = ['10 - Wintersport','60 - Fitness', '40 - Multisport','30 - Lifestyle']
+    summerSeason = ['20 - Outdoor', '25 - Wassersport', '50 - Running', '30 - Lifestyle']
+
+    for index, row in df.iterrows():
+        season = getSeasonByMonth(row)
+        getJoinedWithProduct(df)           
+    
+    
+readRowInDataframe(joined)
+"""
+
+        
+#----------------------------------------------------------------------------------------------------------------------------
+# Construct dataframe with 'Date', 'Most frequent Product category', 'Least frequent Product category', 'Abnormality Class'
+#----------------------------------------------------------------------------------------------------------------------------
+columnNames = ['Date', 'Most Frequent Product Category', 'Least Frequent Product Category', 'Abnormality Class']
+index = np.arange(0)
+featureDF = pd.DataFrame(columns=columnNames, index = index)
+
+# 1. read sales data 
+# 2. join with product dimension data 
+# 3. count the frequency of purchase per UniverseCode
+# 4. Pick the most frequent product category (universe)
+# 5. Pick the least frequent product category (universe)
+
+def setFeature(date, df, featureDF): 
+    # product 
+    dimProduct = 'dimProduct_TSV.csv' #ToDo : Read TSV
+    #product = readAsDataframe(dimProduct) #ToDo : unclean data
+    product = readTsvAsDataframe(dimProduct)
+    #product.info()
+    #product.head(5)
+    #product.groupby(['UniverseCodeDesc']).size()
+ 
+    #print(df.iloc[[0]]) #read 0 index row
+    """
+    zeroIndexRow = df.iloc[[1]] # To Do : Fix this - error intolerant!!
+   
+    dateInt = int(zeroIndexRow['DateID'])
+    #print(dateInt)
+    dateStr = str(dateInt)
+    datee = dt.datetime.strptime(dateStr, "%Y%m%d")
+    #print(datee.month)
+    month = datee.month
+    #season = getSeasonByMonth(zeroIndexRow)
+    """
+    
+    joined = getJoinedWithProduct(df, product)
+    universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() 
+
+    mostfreGrp = getMostFreqGroup(universeGroupBy) 
+    leastfreGrp = getLeastFreqGroup(universeGroupBy)
+    #print(month)
+    #print(mostfreGrp)
+    #print(leastfreGrp)
+    featureDF = featureDF.append({'Date': date, 'Most Frequent Product Category': mostfreGrp, 'Least Frequent Product Category': leastfreGrp, 'Abnormality Class' : 'NA'}, ignore_index=True)
+    return featureDF
+    
+    
+
+def constructFeatureDF(featureDF) : 
+    years = range(2012, 2013) #, 2018)
+#    month_in_2012 = range(12, 13)
+    month_in_general = range(1, 13)
+    month_in_2017 = range(1, 6)
+
+    for y in years : 
+        if y == 2012 : 
+            salesFile = 'factSalesTransactions_' + str(y) + '12' + '.csv'
+            df = readAsDataframe(salesFile)
+            print(salesFile)
+            #getNetAmount(df)
+            date = str(y) + '12'
+            featureDF = setFeature(date, df, featureDF)
+            #featureDF = setFeature(df, featureDF, date)
+        else :     
+                if y == 2017 :
+                    for m in month_in_2017 : 
+                        if(m < 10) :
+                            salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
+                            #readAsDataframe(salesFile)
+                            print(salesFile)
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(0) + str(m)
+                            #featureDF = setFeature(df, featureDF, date)
+                            featureDF = setFeature(date, df, featureDF)
+                        else : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
+                            #readAsDataframe(salesFile)
+                            print(salesFile)
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(m)
+                            #featureDF = setFeature(df, featureDF, date)
+                            featureDF = setFeature(date, df, featureDF)
+                else :
+                    for m in month_in_general : 
+                        if(m < 10) : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
+                            #readAsDataframe(salesFile)
+                            print(salesFile)
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(0) + str(m)
+                            #featureDF = setFeature(df, featureDF, date)
+                            featureDF = setFeature(date, df, featureDF)
+                        else : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
+                            #readAsDataframe(salesFile)
+                            print(salesFile)
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(m)
+                            #featureDF = setFeature(df, featureDF, date)
+                            featureDF = setFeature(date, df, featureDF)
+
+featureDF = constructFeatureDF(featureDF)
+    
+print(featureDF)    
+    
+    
+    
+#------------------------------------------------------------------
+# simple classification based on season
+# ToDo : Find the most popular sport by analyzing all sales data
+"""
+def checkAbnormality(date, mostFrequent, leastFrequent):
+    if mostFrequent in
+    
+
+if item in list:
+    do something 
+
+if item not in list: 
+    do something     
+
 # ToDo : Why UniverseCodeDesc is NaN? 
 # ToDo : Normalization of the product category (since number of ballsport is bigger than Running for example)
+"""
