@@ -349,6 +349,8 @@ def constructFeatureDF(featureDF) :
                             date = str(y) + str(m)
                             #featureDF = setFeature(df, featureDF, date)
                             featureDF = setFeature(date, df, featureDF)
+    return featureDF
+
 
 featureDF = constructFeatureDF(featureDF)
     
