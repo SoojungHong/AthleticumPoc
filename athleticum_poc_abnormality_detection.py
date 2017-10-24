@@ -29,7 +29,6 @@ Feature df example>>
 -------------------------------------------------------------------------------------------
  Date (YY-MM) ¦ Most frequent Product category ¦ Least frequent Product category ¦ Class
 -------------------------------------------------------------------------------------------
-
 """
 
 
@@ -102,13 +101,10 @@ def convertDate(dateStr):
 #---------------------------------------------------------
 def getMostFreqGroup(universeGroupBy): 
     topFive = universeGroupBy.nlargest(5)
-    topFive 
-
     m = 0
     while (topFive.keys()[m].find('N/A') != -1):
         print 'It is N/A'
         m = m + 1
-    #print m#topFive[m]    
     return topFive.keys()[m]
 
 
@@ -117,13 +113,10 @@ def getMostFreqGroup(universeGroupBy):
 #---------------------------------------------------------
 def getLeastFreqGroup(universeGroupBy): 
     bottomFive = universeGroupBy.nsmallest(5)
-    bottomFive 
-
     l = 0
     while (bottomFive.keys()[l].find('N/A') != -1):
         print 'It is N/A'
         l = l + 1  
-    #print bottomFive.keys()[l]
     return bottomFive.keys()[l]
     
 
@@ -248,20 +241,10 @@ def readRowInDataframe(df):
 readRowInDataframe(joined)
 """
 
-        
-#----------------------------------------------------------------------------------------------------------------------------
-# Construct dataframe with 'Date', 'Most frequent Product category', 'Least frequent Product category', 'Abnormality Class'
-#----------------------------------------------------------------------------------------------------------------------------
-columnNames = ['Date', 'Most Frequent Product Category', 'Least Frequent Product Category', 'Abnormality Class']
-index = np.arange(0)
-featureDF = pd.DataFrame(columns=columnNames, index = index)
 
-# 1. read sales data 
-# 2. join with product dimension data 
-# 3. count the frequency of purchase per UniverseCode
-# 4. Pick the most frequent product category (universe)
-# 5. Pick the least frequent product category (universe)
-
+#----------------------------------------
+# Add one row in the feature dataframe 
+#----------------------------------------
 def setFeature(date, df, featureDF): 
     # product 
     dimProduct = 'dimProduct_TSV.csv' #ToDo : Read TSV
@@ -296,9 +279,11 @@ def setFeature(date, df, featureDF):
     return featureDF
     
     
-
+#----------------------------------
+# Constructing Feature Dataframe 
+#----------------------------------
 def constructFeatureDF(featureDF) : 
-    years = range(2012, 2013) #, 2018)
+    years = range(2012, 2018)
 #    month_in_2012 = range(12, 13)
     month_in_general = range(1, 13)
     month_in_2017 = range(1, 6)
@@ -352,26 +337,22 @@ def constructFeatureDF(featureDF) :
     return featureDF
 
 
+#-------------------------------------------
+# Test construct the dataframe with data 
+
+# 1.         
+#----------------------------------------------------------------------------------------------------------------------------
+# Construct dataframe with 'Date', 'Most frequent Product category', 'Least frequent Product category', 'Abnormality Class'
+#----------------------------------------------------------------------------------------------------------------------------
+columnNames = ['Date', 'Most Frequent Product Category', 'Least Frequent Product Category', 'Abnormality Class']
+index = np.arange(0)
+featureDF = pd.DataFrame(columns=columnNames, index = index)
+
 featureDF = constructFeatureDF(featureDF)
     
 print(featureDF)    
+featureDF.tail(5)    
     
-    
-    
-#------------------------------------------------------------------
-# simple classification based on season
-# ToDo : Find the most popular sport by analyzing all sales data
-"""
-def checkAbnormality(date, mostFrequent, leastFrequent):
-    if mostFrequent in
-    
+   
 
-if item in list:
-    do something 
-
-if item not in list: 
-    do something     
-
-# ToDo : Why UniverseCodeDesc is NaN? 
-# ToDo : Normalization of the product category (since number of ballsport is bigger than Running for example)
-"""
+# ToDo : Assign proper value in 'Abnormality class' 
