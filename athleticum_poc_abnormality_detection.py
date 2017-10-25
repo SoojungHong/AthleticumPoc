@@ -368,6 +368,72 @@ def assignNormalityValue(date, mostfreGrp):
         return 'Abnormal' 
         
     
+
+#----------------------------------------------------------
+# Visualize the bar charts 'Date' - 'Abnormality counts'
+#----------------------------------------------------------
+def visualizeAbnormality(df): 
+   import matplotlib.pyplot as plt
+   #from matplotlib.dates import date2num
+   #import datetime
+   """
+   x = [datetime.datetime(2011, 1, 4, 0, 0),
+        datetime.datetime(2011, 1, 5, 0, 0),
+        datetime.datetime(2011, 1, 6, 0, 0)]
+   x = date2num(x)
+   """
+   #x = df['Date'] #ToDo : at the moment, per year 
+
+   """
+   y = [4, 9, 2] #blue 
+   z = [1,2,3] #green
+   k = [11,12,13] #red
+   """
+   #abnormal = df.groupby(['Abnormality Class']).size() 
+   #abnormal = df.groupby(['Abnormality Class']).get_group("Abnormal")
+   #print(abnormal)
+   test = df.groupby('Abnormality Class')['Size'].transform(lambda x: x/sum(x))
+   print(test)
+   """
+   ax = plt.subplot(111)
+   ax.bar(x-0.2, y,width=0.2,color='b',align='center')
+   ax.bar(x, z,width=0.2,color='g',align='center')
+   ax.bar(x+0.2, k,width=0.2,color='r',align='center')
+   ax.xaxis_date()
+   """
+   plt.show()
+
+
+def visualizePieChart(df): 
+    normalityColumn = df.groupby(['Abnormality Class'])
+    """
+    print(normalityColumn.groups.keys())
+    keys = normalityColumn.groups.keys()
+    groups = len(normalityColumn.groups) # how many groups there?
+    """
+    groupList = list()
+    groupCountList = list()
+    for name, group in normalityColumn:
+        #print(name)
+        groupList.append(name)
+        #print(len(group))
+        groupCountList.append(len(group))
+    
+    
+    print(groupList)
+    print(groupCountList)
+    labels = groupList
+    colors = ['gold', 'yellowgreen', 'lightskyblue']
+    explode = (0.1, 0, 0)  # explode 1st slice
+  
+    # Plot
+    plt.pie(groupCountList, explode=explode, labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=True, startangle=140)
+ 
+    plt.axis('equal')
+    plt.show()
+    
+       
 #-------------------------------------------
 # Test construct the dataframe with data 
 
@@ -384,7 +450,14 @@ featureDF = constructFeatureDF(featureDF)
 print(featureDF)    
 featureDF.tail(5)    
     
+
+#visualizeAbnormality(featureDF)   
+
+visualizePieChart(featureDF)
    
 
 # ToDo : Assign proper value in 'Abnormality class' 
+
+# ToDo : Visualize the abnormality distribution 
+
 # ToDo : Question : Whihch product is sold most frequently and least frequently
