@@ -184,13 +184,13 @@ i = 1000
 joined_df[i]
 """
 
-def getSeasonByMonth(row):
+def getSeasonByMonth(date):
     season = 'spring'
     # get Month 
-    dateInt = int(row['DateID'])
+    #dateInt = int(row['DateID'])
     #print(dateInt)
-    dateStr = str(dateInt)
-    datee = dt.datetime.strptime(dateStr, "%Y%m%d")
+    dateStr = str(date)
+    datee = dt.datetime.strptime(dateStr, "%Y%m")
     #print(datee.month)
     month = datee.month
     if(month > 5 & month < 10) : 
@@ -228,19 +228,6 @@ def getJoinedWithProduct(sales, product):
     return joined
     
 
-"""
-def readRowInDataframe(df):
-    winterSeason = ['10 - Wintersport','60 - Fitness', '40 - Multisport','30 - Lifestyle']
-    summerSeason = ['20 - Outdoor', '25 - Wassersport', '50 - Running', '30 - Lifestyle']
-
-    for index, row in df.iterrows():
-        season = getSeasonByMonth(row)
-        getJoinedWithProduct(df)           
-    
-    
-readRowInDataframe(joined)
-"""
-
 
 #----------------------------------------
 # Add one row in the feature dataframe 
@@ -275,7 +262,8 @@ def setFeature(date, df, featureDF):
     #print(month)
     #print(mostfreGrp)
     #print(leastfreGrp)
-    featureDF = featureDF.append({'Date': date, 'Most Frequent Product Category': mostfreGrp, 'Least Frequent Product Category': leastfreGrp, 'Abnormality Class' : 'NA'}, ignore_index=True)
+    normality = assignNormalityValue(date, mostfreGrp)
+    featureDF = featureDF.append({'Date': date, 'Most Frequent Product Category': mostfreGrp, 'Least Frequent Product Category': leastfreGrp, 'Abnormality Class' : normality}, ignore_index=True)
     return featureDF
     
     
@@ -337,6 +325,49 @@ def constructFeatureDF(featureDF) :
     return featureDF
 
 
+
+
+"""
+def readRowInDataframe(df):
+    winterSeason = ['10 - Wintersport','60 - Fitness', '40 - Multisport','30 - Lifestyle']
+    summerSeason = ['20 - Outdoor', '25 - Wassersport', '50 - Running', '30 - Lifestyle']
+
+    for index, row in df.iterrows():
+        season = getSeasonByMonth(row)
+        getJoinedWithProduct(df)           
+    
+    
+readRowInDataframe(joined)
+"""
+
+#-----------------------------------------------------------------------------
+# For the purpose of creating training data, assign the abnormality as below
+#-----------------------------------------------------------------------------
+def assignNormalityValue(date, mostfreGrp):
+    isNormal = False 
+    winterSeason = ['10 - Wintersport','60 - Fitness', '40 - Multisport','30 - Lifestyle']
+    summerSeason = ['20 - Outdoor', '25 - Wassersport', '50 - Running', '60 - Fitness', '30 - Lifestyle']
+
+    season = getSeasonByMonth(date)
+    if season == 'winter': 
+        #freqSportCategory = row[' Most Frequent Product Category']
+        #print freqSportCategory
+        if mostfreGrp in winterSeason: 
+            isNormal = True 
+    else: 
+        if season == 'summer':
+            #freqSportCategory = row[' Most Frequent Product Category']
+            #print freqSportCategory
+            if mostfreGrp in summerSeason: 
+                isNormal = True 
+        else : 
+            return 'NA'
+    if isNormal == True: 
+        return 'Normal'
+    else:
+        return 'Abnormal' 
+        
+    
 #-------------------------------------------
 # Test construct the dataframe with data 
 
@@ -356,3 +387,4 @@ featureDF.tail(5)
    
 
 # ToDo : Assign proper value in 'Abnormality class' 
+# ToDo : Question : Whihch product is sold most frequently and least frequently
