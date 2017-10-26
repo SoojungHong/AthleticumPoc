@@ -184,23 +184,39 @@ i = 1000
 joined_df[i]
 """
 
+
+#--------------------------------
+# Set season 
+#--------------------------------
+spring = range(3,6) #3, 4, 5
+spring
+summer = range(6,9) #6, 7, 8
+summer
+autumn = range(9,11) #9, 10 
+autumn
+winter = [1, 2, 11, 12]
+winter
+
+
 def getSeasonByMonth(date):
-    season = 'spring'
-    # get Month 
-    #dateInt = int(row['DateID'])
-    #print(dateInt)
+    season = 'NA'
     dateStr = str(date)
     datee = dt.datetime.strptime(dateStr, "%Y%m")
-    #print(datee.month)
     month = datee.month
-    if(month > 5 & month < 10) : 
-        season = 'summer'
+    if month in spring:
+        season = 'spring'
     else: 
-        if(month < 3 & month > 10):
-            season = 'winter'
-    print(season)        
+        if month in summer:
+            season = 'summer'
+        else : 
+            if month in autumn : 
+                season = 'autumn' 
+            else : 
+                if month in winter : 
+                    season = 'winter'
+                
+    print(season)
     return season
-    # return season 
     
     
 #----------------------------------------------
@@ -340,6 +356,191 @@ def readRowInDataframe(df):
 readRowInDataframe(joined)
 """
 
+#--------------------------------------------------------------------
+# Find out two most frequent and two least frequent sport category
+#--------------------------------------------------------------------
+"""
+spring = range(3,6) #3, 4, 5
+spring
+summer = range(6,9) #6, 7, 8
+summer
+autumn = range(9,11) #9, 10 
+autumn
+winter = [1, 2, 11, 12]
+winter
+"""
+
+    springSeasonMost = [ ]
+    springSeasonLeast = [ ]
+    
+    summerSeasonMost = [ ]
+    summerSeasonLeast = [ ]
+    
+    autumnSeasonMost = [ ]
+    autumnSeasonLeast = [ ]
+    
+    winterSeasonMost = [ ]
+    winterSeasonLeast = [ ]    
+    
+#---------------------------------------------------------------------------
+# Function : Get 5 most frequent sport category of given date (year-month)
+#---------------------------------------------------------------------------    
+def getFiveMostFrequent(salesFile, dimProduct): 
+    df = readAsDataframe(salesFile)
+    #dimProduct = 'dimProduct_TSV.csv' 
+    #product = readTsvAsDataframe(dimProduct)
+     
+    joined = getJoinedWithProduct(df, product)
+    universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() 
+
+    mostfreGrp = getMostFreqGroup(universeGroupBy) 
+    print(mostfreGrp)
+    return mostfreGrp
+    
+ 
+def getFiveLeastFrequent(salesFile, dimProduct): 
+    df = readAsDataframe(salesFile)
+    #dimProduct = 'dimProduct_TSV.csv' 
+    #product = readTsvAsDataframe(dimProduct)
+     
+    joined = getJoinedWithProduct(df, product)
+    universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() 
+
+    leastfreGrp = getLeastFreqGroup(universeGroupBy)
+    print(leastfreGrp)
+    return leastfreGrp
+
+    
+
+def getMostFrequentSportInSpring(product, springSport):
+    years = range(2012, 2018)
+    month_in_spring = spring 
+    month_in_general = range(1, 13)
+    month_in_2017 = range(1, 6)
+
+    
+    for y in years : 
+        if y == 2012 : 
+            salesFile = 'factSalesTransactions_' + str(y) + '12' + '.csv'
+            print(salesFile)
+            df = readAsDataframe(salesFile)
+            date = str(y) + '12'
+            dateStr = str(date)
+            datee = dt.datetime.strptime(dateStr, "%Y%m")
+            month = datee.month
+            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+            season = getSeasonByMonth(date)
+            
+            if season == 'spring' : 
+                # add to dedicate season but avoid duplicate 
+                 item_list = currentFiveMost
+                 for item in item_list : 
+                     print(item)
+                     if item not in springSport: 
+                         springSport.append(item)
+                               
+        else :     
+                if y == 2017 :
+                    for m in month_in_2017 : 
+                        if(m < 10) :
+                            salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(0) + str(m)
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            print(currentFiveMost)
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentFiveMost
+                                for item in item_list : 
+                                    print(item)
+                                    if item not in springSport: 
+                                        springSport.append(item)
+                                
+                        else : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(m)
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                        if season == 'spring' : 
+                            # add to dedicate season but avoid duplicate 
+                            item_list = currentFiveMost
+                            for item in item_list : 
+                                    if item not in springSport: 
+                                        springSport.append(item)
+                              
+                else :
+                    for m in month_in_general : 
+                        if(m < 10) : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(0) + str(m)
+                
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentFiveMost
+                                for item in item_list :
+                                    print(item)
+                                    if item not in springSport: 
+                                        springSport.append(item)
+                              
+                        else : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(m)
+                 
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentFiveMost
+                                for item in item_list : 
+                                    if item not in springSport: 
+                                        springSport.append(item)
+                              
+    return springSport
+
+
+#--------
+# test     
+dimProduct = 'dimProduct_TSV.csv' 
+product = readTsvAsDataframe(dimProduct)
+ 
+springSport = list()   
+springMostFreq = getMostFrequentSportInSpring(product, springSport)
+springMostFreq
+
+# ToDo : Fix Bug : fitness value is strange
+
 #-----------------------------------------------------------------------------
 # For the purpose of creating training data, assign the abnormality as below
 #-----------------------------------------------------------------------------
@@ -423,7 +624,7 @@ def visualizePieChart(df):
     print(groupList)
     print(groupCountList)
     labels = groupList
-    colors = ['gold', 'yellowgreen', 'lightskyblue']
+    colors = ['red', 'yellowgreen', 'lightskyblue']
     explode = (0.1, 0, 0)  # explode 1st slice
   
     # Plot
@@ -433,6 +634,7 @@ def visualizePieChart(df):
     plt.axis('equal')
     plt.show()
     
+
        
 #-------------------------------------------
 # Test construct the dataframe with data 
@@ -457,6 +659,13 @@ visualizePieChart(featureDF)
    
 
 # ToDo : Assign proper value in 'Abnormality class' 
+# Fix the NA value to something proper categorization
+#---------------------------------------------------------------------------
+# ToDo : 
+#    1. set the season with month (spring, summer, autumn, winter)
+#    2. check the most frequent and least frequent sport in each season
+#    3. create the sport category list for each season 
+#    3. check the most frquent and least frequent sport in all time, add these to each season's list 
 
 # ToDo : Visualize the abnormality distribution 
 
