@@ -377,19 +377,7 @@ autumn
 winter = [1, 2, 11, 12]
 winter
 """
-
-    springSeasonMost = [ ]
-    springSeasonLeast = [ ]
-    
-    summerSeasonMost = [ ]
-    summerSeasonLeast = [ ]
-    
-    autumnSeasonMost = [ ]
-    autumnSeasonLeast = [ ]
-    
-    winterSeasonMost = [ ]
-    winterSeasonLeast = [ ]    
-    
+ 
 #---------------------------------------------------------------------------
 # Function : Get 5 most frequent sport category of given date (year-month)
 #---------------------------------------------------------------------------    
@@ -544,10 +532,12 @@ def getMostFrequentSportInSpring(product, springSport):
 # ToDo : optimize the code 
 def getMostFrequentSportForSeasons(product, springSport, summerSport, autumnSport, winterSport):
     years = range(2012, 2018)
+    """
     month_in_spring = spring 
     month_in_summer = summer 
     month_in_autumn = autumn
     month_in_winter = winter
+    """
     month_in_general = range(1, 13)
     month_in_2017 = range(1, 6)
   
@@ -815,17 +805,20 @@ def assignNormalityValue(date, mostfreGrp):
     if season == 'spring': 
         if mostfreGrp in springSport: 
             isNormal = True 
-    if season == 'summer': 
-        if mostfreGrp in summerSport: 
-            isNormal = True 
-    if season == 'autumn': 
-        if mostfreGrp in autumnSport: 
-            isNormal = True 
-    if season == 'winter': 
-        if mostfreGrp in winterSport: 
-            isNormal = True 
-    else: 
-        return 'NA'
+    else :         
+        if season == 'summer': 
+            if mostfreGrp in summerSport: 
+                isNormal = True 
+        else :         
+            if season == 'autumn': 
+                if mostfreGrp in autumnSport: 
+                    isNormal = True 
+            else : 
+                if season == 'winter': 
+                    if mostfreGrp in winterSport: 
+                        isNormal = True 
+                else : 
+                    return 'NA'                    
     if isNormal == True: 
         return 'Normal'
     else:
