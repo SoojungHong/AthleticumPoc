@@ -107,6 +107,10 @@ def getMostFreqGroup(universeGroupBy):
         m = m + 1
     return topFive.keys()[m]
 
+def getThreeMostGroup(universeGroupBy):
+    topThree = universeGroupBy.nlargest(3)
+    return topThree.keys()
+
 
 #----------------------------------------------------------
 # function : find least frequently purchased product group
@@ -118,6 +122,10 @@ def getLeastFreqGroup(universeGroupBy):
         print 'It is N/A'
         l = l + 1  
     return bottomFive.keys()[l]
+
+def getThreeLeastGroup(universeGroupBy): 
+    bottomThree = universeGroupBy.nsmallest(3)
+    return bottomFive.keys()
     
 
 
@@ -385,7 +393,7 @@ winter
 #---------------------------------------------------------------------------
 # Function : Get 5 most frequent sport category of given date (year-month)
 #---------------------------------------------------------------------------    
-def getFiveMostFrequent(salesFile, dimProduct): 
+def getThreeMostFrequent(salesFile, dimProduct): 
     df = readAsDataframe(salesFile)
     #dimProduct = 'dimProduct_TSV.csv' 
     #product = readTsvAsDataframe(dimProduct)
@@ -393,12 +401,12 @@ def getFiveMostFrequent(salesFile, dimProduct):
     joined = getJoinedWithProduct(df, product)
     universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() 
 
-    mostfreGrp = getMostFreqGroup(universeGroupBy) 
-    print(mostfreGrp)
+    mostfreGrp = getThreeMostGroup(universeGroupBy) 
+    #print(mostfreGrp)
     return mostfreGrp
     
  
-def getFiveLeastFrequent(salesFile, dimProduct): 
+def getThreeLeastFrequent(salesFile, dimProduct): 
     df = readAsDataframe(salesFile)
     #dimProduct = 'dimProduct_TSV.csv' 
     #product = readTsvAsDataframe(dimProduct)
@@ -406,8 +414,8 @@ def getFiveLeastFrequent(salesFile, dimProduct):
     joined = getJoinedWithProduct(df, product)
     universeGroupBy = joined.groupby(['UniverseCodeDesc']).size() 
 
-    leastfreGrp = getLeastFreqGroup(universeGroupBy)
-    print(leastfreGrp)
+    leastfreGrp = getThreeLeastGroup(universeGroupBy)
+    #print(leastfreGrp)
     return leastfreGrp
 
     
@@ -417,8 +425,7 @@ def getMostFrequentSportInSpring(product, springSport):
     month_in_spring = spring 
     month_in_general = range(1, 13)
     month_in_2017 = range(1, 6)
-
-    
+  
     for y in years : 
         if y == 2012 : 
             salesFile = 'factSalesTransactions_' + str(y) + '12' + '.csv'
@@ -428,17 +435,17 @@ def getMostFrequentSportInSpring(product, springSport):
             dateStr = str(date)
             datee = dt.datetime.strptime(dateStr, "%Y%m")
             month = datee.month
-            currentFiveMost = getFiveMostFrequent(salesFile, product) 
-            #currentFiveLeast = getFiveLeastFrequent(salesFile)
-            
+            currentThreeMost = getThreeMostFrequent(salesFile, product) 
+      
             season = getSeasonByMonth(date)
             
             if season == 'spring' : 
                 # add to dedicate season but avoid duplicate 
-                 item_list = currentFiveMost
+                 item_list = currentThreeMost
+                 #print(item_list)
                  for item in item_list : 
-                     print(item)
                      if item not in springSport: 
+                         print(item)
                          springSport.append(item)
                                
         else :     
@@ -451,18 +458,18 @@ def getMostFrequentSportInSpring(product, springSport):
                             dateStr = str(date)
                             datee = dt.datetime.strptime(dateStr, "%Y%m")
                             month = datee.month
-                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
-                            print(currentFiveMost)
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
                             #currentFiveLeast = getFiveLeastFrequent(salesFile)
             
                             season = getSeasonByMonth(date)
             
                             if season == 'spring' : 
                                 # add to dedicate season but avoid duplicate 
-                                item_list = currentFiveMost
+                                item_list = currentThreeMost
+                                #print(item_list)
                                 for item in item_list : 
-                                    print(item)
                                     if item not in springSport: 
+                                        print(item)
                                         springSport.append(item)
                                 
                         else : 
@@ -472,16 +479,17 @@ def getMostFrequentSportInSpring(product, springSport):
                             dateStr = str(date)
                             datee = dt.datetime.strptime(dateStr, "%Y%m")
                             month = datee.month
-                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
                             #currentFiveLeast = getFiveLeastFrequent(salesFile)
             
                             season = getSeasonByMonth(date)
-            
-                        if season == 'spring' : 
-                            # add to dedicate season but avoid duplicate 
-                            item_list = currentFiveMost
-                            for item in item_list : 
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
                                     if item not in springSport: 
+                                        print(item)
                                         springSport.append(item)
                               
                 else :
@@ -494,17 +502,18 @@ def getMostFrequentSportInSpring(product, springSport):
                             dateStr = str(date)
                             datee = dt.datetime.strptime(dateStr, "%Y%m")
                             month = datee.month
-                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
                             #currentFiveLeast = getFiveLeastFrequent(salesFile)
             
                             season = getSeasonByMonth(date)
             
                             if season == 'spring' : 
                                 # add to dedicate season but avoid duplicate 
-                                item_list = currentFiveMost
+                                item_list = currentThreeMost
+                                #print(item_list)
                                 for item in item_list :
-                                    print(item)
                                     if item not in springSport: 
+                                        print(item)
                                         springSport.append(item)
                               
                         else : 
@@ -515,19 +524,262 @@ def getMostFrequentSportInSpring(product, springSport):
                             dateStr = str(date)
                             datee = dt.datetime.strptime(dateStr, "%Y%m")
                             month = datee.month
-                            currentFiveMost = getFiveMostFrequent(salesFile, product) 
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
                             #currentFiveLeast = getFiveLeastFrequent(salesFile)
             
                             season = getSeasonByMonth(date)
             
                             if season == 'spring' : 
                                 # add to dedicate season but avoid duplicate 
-                                item_list = currentFiveMost
+                                item_list = currentThreeMost
+                                #print(item_list)
                                 for item in item_list : 
                                     if item not in springSport: 
+                                        print(item)
                                         springSport.append(item)
                               
     return springSport
+
+#-------------------------------
+# ToDo : optimize the code 
+def getMostFrequentSportForSeasons(product, springSport, summerSport, autumnSport, winterSport):
+    years = range(2012, 2018)
+    month_in_spring = spring 
+    month_in_summer = summer 
+    month_in_autumn = autumn
+    month_in_winter = winter
+    month_in_general = range(1, 13)
+    month_in_2017 = range(1, 6)
+  
+    for y in years : 
+        if y == 2012 : 
+            salesFile = 'factSalesTransactions_' + str(y) + '12' + '.csv'
+            print(salesFile)
+            df = readAsDataframe(salesFile)
+            date = str(y) + '12'
+            dateStr = str(date)
+            datee = dt.datetime.strptime(dateStr, "%Y%m")
+            month = datee.month
+            currentThreeMost = getThreeMostFrequent(salesFile, product) 
+      
+            season = getSeasonByMonth(date)
+            
+            if season == 'spring' : 
+                # add to dedicate season but avoid duplicate 
+                 item_list = currentThreeMost
+                 #print(item_list)
+                 for item in item_list : 
+                     if item not in springSport: 
+                         print(item)
+                         springSport.append(item)
+            if season == 'summer' : 
+                # add to dedicate season but avoid duplicate 
+                 item_list = currentThreeMost
+                 #print(item_list)
+                 for item in item_list : 
+                     if item not in summerSport: 
+                         print(item)
+                         summerSport.append(item)
+            if season == 'autumn' : 
+                # add to dedicate season but avoid duplicate 
+                 item_list = currentThreeMost
+                 #print(item_list)
+                 for item in item_list : 
+                     if item not in autumnSport: 
+                         print(item)
+                         autumnSport.append(item)   
+            if season == 'winter' : 
+                # add to dedicate season but avoid duplicate 
+                 item_list = currentThreeMost
+                 #print(item_list)
+                 for item in item_list : 
+                     if item not in winterSport: 
+                         print(item)
+                         winterSport.append(item)             
+        else :     
+                if y == 2017 :
+                    for m in month_in_2017 : 
+                        if(m < 10) :
+                            salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(0) + str(m)
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in springSport: 
+                                        print(item)
+                                        springSport.append(item)
+                            if season == 'summer' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in summerSport: 
+                                        print(item)
+                                        summerSport.append(item)
+                            if season == 'autumn' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in autumnSport: 
+                                        print(item)
+                                        autumnSport.append(item)   
+                            if season == 'winter' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in winterSport: 
+                                        print(item)
+                                        winterSport.append(item)            
+                                
+                        else : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(m)
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in springSport: 
+                                        print(item)
+                                        springSport.append(item)
+                            if season == 'summer' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in summerSport: 
+                                        print(item)
+                                        summerSport.append(item)
+                            if season == 'autumn' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in autumnSport: 
+                                        print(item)
+                                        autumnSport.append(item)   
+                            if season == 'winter' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in winterSport: 
+                                        print(item)
+                                        winterSport.append(item)            
+                else :
+                    for m in month_in_general : 
+                        if(m < 10) : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(0) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(0) + str(m)
+                
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list :
+                                    if item not in springSport: 
+                                        print(item)
+                                        springSport.append(item)
+                            if season == 'summer' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in summerSport: 
+                                        print(item)
+                                        summerSport.append(item)
+                            if season == 'autumn' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in autumnSport: 
+                                        print(item)
+                                        autumnSport.append(item)   
+                            if season == 'winter' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in winterSport: 
+                                        print(item)
+                                        winterSport.append(item)            
+                        else : 
+                            salesFile = 'factSalesTransactions_' + str(y) + str(m) + '.csv'
+                            df = readAsDataframe(salesFile)
+                            date = str(y) + str(m)
+                 
+                            dateStr = str(date)
+                            datee = dt.datetime.strptime(dateStr, "%Y%m")
+                            month = datee.month
+                            currentThreeMost = getThreeMostFrequent(salesFile, product) 
+                            #currentFiveLeast = getFiveLeastFrequent(salesFile)
+            
+                            season = getSeasonByMonth(date)
+            
+                            if season == 'spring' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in springSport: 
+                                        print(item)
+                                        springSport.append(item)
+                            if season == 'summer' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in summerSport: 
+                                        print(item)
+                                        summerSport.append(item)
+                            if season == 'autumn' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in autumnSport: 
+                                        print(item)
+                                        autumnSport.append(item)   
+                            if season == 'winter' : 
+                                # add to dedicate season but avoid duplicate 
+                                item_list = currentThreeMost
+                                #print(item_list)
+                                for item in item_list : 
+                                    if item not in winterSport: 
+                                        print(item)
+                                        winterSport.append(item)            
+  
 
 
 #--------
@@ -535,9 +787,19 @@ def getMostFrequentSportInSpring(product, springSport):
 dimProduct = 'dimProduct_TSV.csv' 
 product = readTsvAsDataframe(dimProduct)
  
-springSport = list()   
+springSport = list() 
+summerSport = list()
+autumnSport = list()
+winterSport = list()  
 springMostFreq = getMostFrequentSportInSpring(product, springSport)
 springMostFreq
+
+
+getMostFrequentSportForSeasons(product, springSport, summerSport, autumnSport, winterSport)
+springSport 
+summerSport
+autumnSport
+winterSport
 
 # ToDo : Fix Bug : fitness value is strange
 
@@ -546,23 +808,24 @@ springMostFreq
 #-----------------------------------------------------------------------------
 def assignNormalityValue(date, mostfreGrp):
     isNormal = False 
-    winterSeason = ['10 - Wintersport','60 - Fitness', '40 - Multisport','30 - Lifestyle']
-    summerSeason = ['20 - Outdoor', '25 - Wassersport', '50 - Running', '60 - Fitness', '30 - Lifestyle']
+    #winterSeason = ['10 - Wintersport','60 - Fitness', '40 - Multisport','30 - Lifestyle']
+    #summerSeason = ['20 - Outdoor', '25 - Wassersport', '50 - Running', '60 - Fitness', '30 - Lifestyle']
 
     season = getSeasonByMonth(date)
+    if season == 'spring': 
+        if mostfreGrp in springSport: 
+            isNormal = True 
+    if season == 'summer': 
+        if mostfreGrp in summerSport: 
+            isNormal = True 
+    if season == 'autumn': 
+        if mostfreGrp in autumnSport: 
+            isNormal = True 
     if season == 'winter': 
-        #freqSportCategory = row[' Most Frequent Product Category']
-        #print freqSportCategory
-        if mostfreGrp in winterSeason: 
+        if mostfreGrp in winterSport: 
             isNormal = True 
     else: 
-        if season == 'summer':
-            #freqSportCategory = row[' Most Frequent Product Category']
-            #print freqSportCategory
-            if mostfreGrp in summerSeason: 
-                isNormal = True 
-        else : 
-            return 'NA'
+        return 'NA'
     if isNormal == True: 
         return 'Normal'
     else:
