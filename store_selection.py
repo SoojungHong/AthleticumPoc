@@ -83,4 +83,9 @@ joinedSimplified
 # per Store, sum of NetAmount
 joinedSimplified['sum_values_netamount'] = joinedSimplified.groupby('StoreID')['NetAmount'].transform(np.sum)
 joined_withoutDuplicate=joinedSimplified.drop_duplicates(subset=['StoreID', 'StoreSizeSqm', 'StoreCodeName', 'PathName02', 'sum_values_netamount'], keep='first')
+print(type(joined_withoutDuplicate))
+
+#sort using NetAmount
+joined_withoutDuplicate.sort(['sum_values_netamount'], ascending=False)
+joined_withoutDuplicate = joined_withoutDuplicate.sort_values(by=['sum_values_netamount'], ascending=[False])
 joined_withoutDuplicate
